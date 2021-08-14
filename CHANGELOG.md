@@ -6,13 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2021-08-14
+### Fixed
+- [Bug] Package.json missing the version fieled now gets 0.0.0 written.
+
 ## [0.2.0] - 2021-08-14
 ### Changed
 - Split code up into multiple files to be more organized and modular
 - Added a readme
 ### Fixed
 - [Bug] When npm installed, created binary was missing shebang
-- [Bug] Package.json missing the version filed now has it added at 0.0.0 (which gets incremented)
+- [Bug] Package.json missing the version fieled now has it added at 0.0.0 (which gets incremented)
 ## [0.1.0] - 2021-08-14
 
 ### Added
