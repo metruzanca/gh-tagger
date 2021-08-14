@@ -45,7 +45,7 @@ async function main() {
       await createTag(version, label, releaseMessage)
   
       console.log(chalk.green('Pushing Files & Tag...'))
-      await exec(`git push --tags`)
+      await exec(`git push --follow-tags `)
       
       console.log('Release Created and Deploying! 🚀')
     } catch (error) {

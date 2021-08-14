@@ -19,8 +19,8 @@ jobs:
     # - run: npm test
     - run: npm run build
     - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     - uses: ncipollo/release-action@v1
       with:
         artifacts: "lib/*, package.json, LICENSE, readme.md"
