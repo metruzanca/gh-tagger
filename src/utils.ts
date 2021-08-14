@@ -1,4 +1,4 @@
-import { updateJson } from "./fs"
+import { exists, updateJson } from "./fs"
 import { PackageJson } from "./types"
 
 async function getVersion(version: string|undefined, packageJsonPath: string) {
@@ -24,6 +24,10 @@ function getSemverPaths(semverPaths: string[]|undefined, packageJsonPath: string
 }
 
 export async function validatePackageJson(packageJsonPath: string): Promise<PackageJson> {
+  if(!await exists(packageJsonPath)) {
+    console.error('No package.json at cwd. Please make sure you\'re running this from the same directory as package.json')
+    process.exit(1)
+  }
   const pj = require(packageJsonPath)
 
   const packageVersion = await getVersion(pj.version, packageJsonPath)

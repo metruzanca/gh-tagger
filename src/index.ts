@@ -65,10 +65,15 @@ async function updateFiles(filePaths: string[], version: string) {
   try {
     for (const path of filePaths) {
       const resolvedPath = resolve(PROJECT_ROOT, path)
-      await updateJson(resolvedPath, data => {
-        data.version = version
-        return data
-      })
+      try {
+        await updateJson(resolvedPath, data => {
+          data.version = version
+          return data
+        })
+      } catch (error) {
+        console.error(error)
+        process.exit(1)
+      }
     }
   } catch (error) {
     console.error(error);
