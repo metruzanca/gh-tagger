@@ -1,6 +1,6 @@
 {
   "name": "gh-tagger",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "A CLI for creating github releases",
   "main": "./lib/index.js",
   "files": [
