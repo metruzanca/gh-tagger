@@ -44,10 +44,10 @@ async function main() {
       console.log(chalk.green('Creating Release Tag...'))
       await createTag(version, label, releaseMessage)
   
-      // console.log(chalk.green('Pushing Files & Tag...'))
-      // await exec(`git push --tags`)
+      console.log(chalk.green('Pushing Files & Tag...'))
+      await exec(`git push --tags`)
       
-      // console.log('Release Created and Deploying! 🚀')
+      console.log('Release Created and Deploying! 🚀')
     } catch (error) {
       console.error(chalk.red("Something went wrong while attempting to create git tags."))
       console.error("I recommend running\n\ngit status\n\nto find out what happened.")
