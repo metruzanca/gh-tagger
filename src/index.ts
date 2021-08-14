@@ -1,27 +1,25 @@
+#!/usr/bin/node
+
 import inquirer from 'inquirer'
 import chalk from 'chalk'
-import execSh from 'exec-sh'
 
 import { resolve } from 'path'
-import fs from 'fs/promises'
+import { validatePackageJson } from './utils'
+import { updateJson } from './fs'
+import { Label, LabelNumber } from './types'
+import { commit, createTag, push } from './git'
+import { incrementSemver, parseLabel } from './semver'
 
-const exec = execSh.promise
-
-const projectRoot = process.cwd()
-
-const {
-  version: packageVersion,
-  semverPaths
-} = require(resolve(projectRoot, 'package.json'))
-
-const SEMVER = semverPaths as string[] 
-
-type Label = 'patch'|'minor'|'major'
-type LabelNumber = 0|1|2
+const PROJECT_ROOT = process.cwd()
 
 main()
 
 async function main() {
+  const {
+    packageVersion,
+    semverPaths,
+  } = await validatePackageJson(resolve(PROJECT_ROOT, 'package.json'))
+  
   const label = process.argv[2] as Label
   const labelNumber = parseLabel(label)
   const releaseMessage = process.argv[3]
@@ -36,16 +34,16 @@ async function main() {
   if (confirm) {
     try {
       console.log(chalk.green('Updating Files...'))
-      await updateFiles(SEMVER, version)
+      await updateFiles(semverPaths, version)
   
       console.log(chalk.green('Commiting Files...'))
-      await commit(version)
+      await commit(version, packageVersion)
   
       console.log(chalk.green('Creating Release Tag...'))
-      await createTag(version, label, releaseMessage)
+      await createTag(version, packageVersion, label, releaseMessage)
   
       console.log(chalk.green('Pushing Files & Tag...'))
-      await exec(`git push --follow-tags `)
+      await push()
       
       console.log('Release Created and Deploying! 🚀')
     } catch (error) {
@@ -54,25 +52,6 @@ async function main() {
       console.error("Make sure git is installed in this shell.")
     }
   }
-}
-
-function parseLabel(label: Label): LabelNumber {
-  switch (label) {
-    case 'major': return 0
-    case 'minor': return 1
-    case 'patch': return 2
-    default:
-      console.error(`Received "${process.argv[2]}" and was expecting one of ["patch", "minor", "major"]`)
-      process.exit(1)
-  }
-}
-
-function incrementSemver(version: string, label: LabelNumber) {
-  const currentVersion = version
-    .split('.')
-    .map((n:string) => parseInt(n))
-  currentVersion[label] = currentVersion[label] + 1
-  return currentVersion.join('.')
 }
 
 function colorizeVersion(version: string, label: LabelNumber) {
@@ -85,29 +64,14 @@ function colorizeVersion(version: string, label: LabelNumber) {
 async function updateFiles(filePaths: string[], version: string) {
   try {
     for (const path of filePaths) {
-      const resolvedPath = resolve(projectRoot, path)
-      const data = await fs.readFile(resolvedPath, 'utf-8').then(JSON.parse)
-      data.version = version      
-      await fs.writeFile(resolvedPath, JSON.stringify(data, null, 2))
+      const resolvedPath = resolve(PROJECT_ROOT, path)
+      await updateJson(resolvedPath, data => {
+        data.version = version
+        return data
+      })
     }
   } catch (error) {
     console.error('Missing semverPaths key in package.json');
     process.exit(1)
   }
-}
-
-function capitalize(str: string) {
-  return str.charAt(0).toUpperCase() + str.slice(1)
-}
-
-async function commit(version: string) {
-  const commitMessage = `Updated version ${packageVersion} => ${version}`
-  await exec(`git add . && git commit -m "${commitMessage}"`)
-}
-
-async function createTag(version: string, label: string, message: string) {
-  message = message ? ` - ${message}` : ''
-  const tagMessage = `${capitalize(label)} update: ${packageVersion} => ${version}${message}`
-  await exec(`git tag -a ${version} -m "${tagMessage}"`)
-  console.log(tagMessage)
 }
