@@ -1,30 +1,37 @@
 import { updateJson } from "./fs"
 import { PackageJson } from "./types"
 
-export async function validatePackageJson(packageJsonPath: string): Promise<PackageJson> {
-  const {
-    version: packageVersion,
-    semverPaths
-  } = require(packageJsonPath)
-  if(!packageVersion) {
-    await updateJson(packageJsonPath, data => {
-      data.version = '0.0.0'
-      return data
-    })
-    return {
-      packageVersion: '0.0.0',
-      semverPaths: [
-        packageJsonPath,
-        ...semverPaths,
-      ]
-    }
+async function getVersion(version: string|undefined, packageJsonPath: string) {
+  if (version) {
+    return version
   }
+  console.warn('Missing version field')
+  console.warn('Adding version field set to 0.0.0 in package.json')  
+  await updateJson(packageJsonPath, data => {
+    data.version = '0.0.0'
+    return data
+  })
+  return require(packageJsonPath).version
+}
+
+function getSemverPaths(semverPaths: string[]|undefined, packageJsonPath: string) {
+  const paths = [packageJsonPath]
+  if (Array.isArray(semverPaths)) {
+    paths.push(...semverPaths)
+    return paths 
+  }
+  return paths
+}
+
+export async function validatePackageJson(packageJsonPath: string): Promise<PackageJson> {
+  const pj = require(packageJsonPath)
+
+  const packageVersion = await getVersion(pj.version, packageJsonPath)
+  const semverPaths = getSemverPaths(pj.semverPaths, packageJsonPath)
+
   return {
     packageVersion,
-    semverPaths: [
-      packageJsonPath,
-      ...semverPaths,
-    ],
+    semverPaths,
   }
 }
 
