@@ -7,8 +7,12 @@ import fs from 'fs/promises'
 
 const exec = execSh.promise
 
-const packageJsonPath = resolve(process.cwd(), 'package.json')
-const {version: packageVersion, semverPaths} = require(packageJsonPath)
+const projectRoot = process.cwd()
+
+const {
+  version: packageVersion,
+  semverPaths
+} = require(resolve(projectRoot, 'package.json'))
 
 const SEMVER = semverPaths as string[] 
 
@@ -81,12 +85,13 @@ function colorizeVersion(version: string, label: LabelNumber) {
 async function updateFiles(filePaths: string[], version: string) {
   try {
     for (const path of filePaths) {
-      const resolvedPath = resolve(path)
+      const resolvedPath = resolve(projectRoot, path)
       const data = await fs.readFile(resolvedPath, 'utf-8').then(JSON.parse)
       data.version = version      
       await fs.writeFile(resolvedPath, JSON.stringify(data, null, 2))
     }
   } catch (error) {
+    console.error('Missing semverPaths key in package.json');
     process.exit(1)
   }
 }
