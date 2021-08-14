@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.2] - 2021-08-14
+### Changed
+- package.json is now a default for semver updates
+
 ## [0.2.1] - 2021-08-14
 ### Fixed
 - [Bug] Package.json missing the version fieled now gets 0.0.0 written.

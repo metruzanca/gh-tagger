@@ -71,7 +71,7 @@ async function updateFiles(filePaths: string[], version: string) {
       })
     }
   } catch (error) {
-    console.error('Missing semverPaths key in package.json');
+    console.error(error);
     process.exit(1)
   }
 }

@@ -13,12 +13,18 @@ export async function validatePackageJson(packageJsonPath: string): Promise<Pack
     })
     return {
       packageVersion: '0.0.0',
-      semverPaths
+      semverPaths: [
+        packageJsonPath,
+        ...semverPaths,
+      ]
     }
   }
   return {
     packageVersion,
-    semverPaths,
+    semverPaths: [
+      packageJsonPath,
+      ...semverPaths,
+    ],
   }
 }
 
