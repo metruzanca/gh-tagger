@@ -51,3 +51,11 @@ jobs:
 ```
 
 > bodyFile is optional. I personally like to copy the most recent version from my CHANGELOG.
+
+
+### Todo
+
+- [ ] If its a new fresh repo, git push will fail and will instead need to run `git push -u origin master` first then then push tags. (not all at once with --follow-tags as gh actions don't trigger if they aren't already on github when the tag gets pushed)
+  - [ ] check if -u is already setup
+  - [ ] use origin by default, but add a config option to change this
+  - [ ] push current branch's name
